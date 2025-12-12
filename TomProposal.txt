@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TVET Uganda: Target Operating Model Proposal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Chart Container Styling per Requirements */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px; /* Constrain width for readability */
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+
+        /* Custom Scrollbar for sleek look */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* Animations */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .step-active {
+            border-left: 4px solid #F59E0B; /* Amber-500 */
+            background-color: #FFFBEB; /* Amber-50 */
+        }
+        
+        /* Grid Highlight Classes */
+        .matrix-cell { transition: all 0.3s ease; }
+        .matrix-cell:hover { transform: scale(1.02); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        
+        /* Smooth Scrolling */
+        html { scroll-behavior: smooth; }
+    </style>
+    <!-- Chosen Palette: Warm Professional -->
+    <!-- Primary Background: Warm Neutrals (Slate-50, Stone-100) to create a calm, foundation-like feel. -->
+    <!-- Accents: Executive Blue (Slate-800) for authority, Alert Amber (Amber-500) for urgency/deadlines, Growth Green (Emerald-600) for solutions. -->
+    
+    <!-- Application Structure Plan: 
+         1. Hero/Executive Summary: Immediate context setting (Act 2025 context).
+         2. The Challenge (Grid Layout): Interactive cards detailing the 3 core problems (Fragmentation, Overlap, Finance).
+         3. The Solution (TOM Framework Hub): A tabbed interface allowing deep dive into the 3 Action Frameworks.
+            - Tab 1 (Consolidation): Focus on the Process Flow (Action I). Implements a step-by-step interactive visualizer for the new Licensing workflow.
+            - Tab 2 (Clarity): Visualization of the Governance Structure & DOA Matrix.
+            - Tab 3 (Finance): Financial model visualization using Chart.js.
+         4. Implementation Roadmap: Timeline view of Phase 1 & 2.
+         Rationale: The report is dense and structural. A linear read is boring. Grouping by "Problem -> Solution -> Specific Mechanism" allows the user to navigate complex regulatory concepts intuitively.
+    -->
+
+    <!-- Visualization & Content Choices:
+         1. Executive Stats -> Inform -> HTML Stat Cards -> Simple, bold numbers to highlight urgency (Deadline Dec 15).
+         2. Problem Analysis -> Inform -> Interactive Cards -> Click to reveal details, keeping the UI clean.
+         3. Digital Licensing Flow -> Change/Process -> Interactive Vertical Stepper -> JS-driven highlighting to simulate the "Flow" requested by the user. NO SVG used.
+         4. Governance Matrix -> Organize -> CSS Grid Table -> Clear comparison of roles (Council vs Secretariat vs Board).
+         5. Financial Risk vs Stability -> Compare -> Chart.js Bar Chart -> Visualizing the "Levy Collection" efficiency gap to justify the TOM.
+    -->
+    
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+</head>
+<body class="bg-stone-50 text-slate-800 font-sans leading-relaxed">
+
+    <!-- Contact Modal -->
+    <div id="contact-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 z-[100] hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl p-8 w-full max-w-md shadow-2xl transform transition-all scale-100">
+            <h3 class="text-2xl font-bold mb-4 text-slate-800 border-b pb-2">Proposal Pitch</h3>
+            <p class="text-slate-600 mb-6">This interactive application represents the Target Operating Model (TOM) proposal for the TVET Council. It is designed to demonstrate digital readiness and strategic clarity.</p>
+            <div class="space-y-4">
+                <div class="p-3 bg-stone-100 rounded flex items-center">
+                    <i class="fas fa-briefcase text-amber-500 text-xl mr-3"></i>
+                    <div>
+                        <p class="font-bold text-slate-800">Apex Consulting</p>
+                        <p class="text-xs text-slate-500">Strategic Advisory Services</p>
+                    </div>
+                </div>
+                <div class="p-3 bg-stone-100 rounded flex items-center">
+                    <i class="fas fa-bullseye text-amber-500 text-xl mr-3"></i>
+                    <div>
+                        <p class="font-bold text-slate-800">Section 17(2)(d) Compliance</p>
+                        <p class="text-xs text-slate-500">Operating Plan Development</p>
+                    </div>
+                </div>
+            </div>
+            <button onclick="document.getElementById('contact-modal').classList.add('hidden')" class="mt-8 w-full bg-slate-800 text-white px-4 py-3 rounded font-semibold hover:bg-slate-700 transition shadow-lg">
+                Return to Presentation
+            </button>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="bg-slate-900 text-white shadow-lg sticky top-0 z-50 transition-all duration-300">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-amber-500 rounded flex items-center justify-center font-bold text-slate-900 shadow-amber-500/50 shadow-lg">A</div>
+                <div class="flex flex-col">
+                    <span class="font-bold text-lg tracking-wide leading-tight">Apex Consulting</span>
+                    <span class="text-[10px] text-slate-400 uppercase tracking-widest">TVET Project</span>
+                </div>
+            </div>
+            <div class="hidden md:flex gap-8 text-sm font-medium items-center">
+                <a href="#executive-summary" class="hover:text-amber-400 transition border-b-2 border-transparent hover:border-amber-400 py-1">Executive Summary</a>
+                <a href="#challenges" class="hover:text-amber-400 transition border-b-2 border-transparent hover:border-amber-400 py-1">Key Challenges</a>
+                <a href="#tom-framework" class="hover:text-amber-400 transition border-b-2 border-transparent hover:border-amber-400 py-1">The Solution (TOM)</a>
+                <a href="#implementation" class="hover:text-amber-400 transition border-b-2 border-transparent hover:border-amber-400 py-1">Roadmap</a>
+            </div>
+            <button onclick="document.getElementById('contact-modal').classList.remove('hidden')" class="bg-amber-500 hover:bg-amber-600 text-slate-900 px-5 py-2 rounded-full text-sm font-bold transition shadow-lg hover:shadow-amber-500/50 transform hover:-translate-y-0.5">
+                Start Pitch
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="bg-slate-800 text-white pt-20 pb-28 relative overflow-hidden">
+        <div class="container mx-auto px-4 relative z-10">
+            <div class="max-w-4xl mx-auto text-center md:text-left">
+                <div class="inline-block bg-amber-500 text-slate-900 text-xs font-bold px-3 py-1 rounded mb-6 shadow-md">TVET ACT 2025 COMPLIANCE</div>
+                <h1 class="text-4xl md:text-6xl font-extrabold mb-6 leading-tight tracking-tight">
+                    Integrated Target Operating Model (TOM)
+                </h1>
+                <p class="text-slate-300 text-lg md:text-xl mb-10 max-w-2xl leading-relaxed">
+                    A strategic blueprint to transition the TVET Council from legislative mandate to operational reality. Streamlining accreditation, harmonizing mandates, and securing financial sustainability.
+                </p>
+                <div class="flex flex-wrap gap-4 justify-center md:justify-start">
+                    <a href="#challenges" class="bg-white text-slate-900 px-8 py-3 rounded-lg font-bold hover:bg-stone-100 transition shadow-lg flex items-center gap-2">
+                        <span>Identify Risks</span>
+                        <i class="fas fa-arrow-down"></i>
+                    </a>
+                    <a href="#tom-framework" class="border-2 border-amber-500 text-amber-500 px-8 py-3 rounded-lg font-bold hover:bg-amber-500 hover:text-slate-900 transition flex items-center gap-2">
+                        <span>View Solution</span>
+                        <i class="fas fa-layer-group"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <!-- Decorative Background Element (CSS Only) -->
+        <div class="absolute right-0 top-0 w-1/2 h-full bg-slate-700 opacity-10 skew-x-12 translate-x-32 pointer-events-none"></div>
+        <div class="absolute left-0 bottom-0 w-1/3 h-1/2 bg-amber-500 opacity-5 -skew-y-12 -translate-x-10 pointer-events-none"></div>
+    </header>
+
+    <!-- Executive Summary / Context Dashboard -->
+    <section id="executive-summary" class="container mx-auto px-4 -mt-20 relative z-20 mb-24">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 border-t-8 border-amber-500">
+            <p class="text-slate-500 text-sm mb-6 font-semibold uppercase tracking-wider text-center md:text-left">Situation Analysis & Urgency</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 text-center divide-y md:divide-y-0 md:divide-x divide-slate-100">
+                <div class="p-4 hover:bg-stone-50 transition rounded-lg">
+                    <div class="text-5xl font-black text-slate-800 mb-2">5+</div>
+                    <div class="text-xs text-slate-500 uppercase tracking-wider font-bold">Acts Repealed</div>
+                    <p class="text-sm text-slate-600 mt-2 font-medium">Consolidated into Act No. 3 of 2025</p>
+                </div>
+                <div class="p-4 hover:bg-stone-50 transition rounded-lg">
+                    <div class="text-5xl font-black text-amber-600 mb-2">Dec 15</div>
+                    <div class="text-xs text-slate-500 uppercase tracking-wider font-bold">Licensing Deadline</div>
+                    <p class="text-sm text-amber-700 mt-2 font-medium bg-amber-50 inline-block px-2 py-1 rounded">Urgent Priority</p>
+                </div>
+                <div class="p-4 hover:bg-stone-50 transition rounded-lg">
+                    <div class="text-5xl font-black text-slate-800 mb-2">1%</div>
+                    <div class="text-xs text-slate-500 uppercase tracking-wider font-bold">SD Levy</div>
+                    <p class="text-sm text-slate-600 mt-2 font-medium">New Fund Source (SDF)</p>
+                </div>
+                <div class="p-4 hover:bg-stone-50 transition rounded-lg">
+                    <div class="text-5xl font-black text-emerald-600 mb-2">3</div>
+                    <div class="text-xs text-slate-500 uppercase tracking-wider font-bold">Frameworks</div>
+                    <p class="text-sm text-slate-600 mt-2 font-medium">Consolidation, Clarity, Finance</p>
+                </div>
+            </div>
+            
+            <div class="mt-10 pt-8 border-t border-slate-100">
+                <h2 class="text-xl font-bold text-slate-800 mb-2"><i class="fas fa-info-circle text-amber-500 mr-2"></i>Context & Mandate</h2>
+                <p class="text-slate-600 leading-relaxed text-sm md:text-base">
+                    The enactment of the <strong>TVET Act 2025</strong> is a landmark commitment. However, as a public sector start-up, the Council faces the "structural inertia" of merging five disparate entities. Without a defined <strong>Target Operating Model (TOM)</strong> pursuant to <strong>Section 17(2)(d)</strong>, the Council risks operational bottlenecks that will delay the registration of critical tradespeople (mechanics, health workers, ICT specialists).
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Problem Definition Section -->
+    <section id="challenges" class="bg-stone-100 py-20">
+        <div class="container mx-auto px-4">
+            <div class="mb-16 text-center">
+                <span class="bg-slate-200 text-slate-600 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">Gap Analysis</span>
+                <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mt-4 mb-4">Current Operating Model Risks</h2>
+                <p class="text-slate-600 max-w-2xl mx-auto">
+                    The transition period creates high ambiguity. We have identified three critical friction points that the TOM must resolve immediately to prevent functional failure.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Challenge 1 -->
+                <div class="bg-white p-8 rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer group border border-transparent hover:border-red-200" onclick="toggleDetail('challenge-1')">
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="w-14 h-14 bg-red-50 rounded-full flex items-center justify-center text-red-600 text-2xl group-hover:scale-110 transition-transform">
+                            <i class="fas fa-sitemap"></i>
+                        </div>
+                        <i id="icon-challenge-1" class="fas fa-plus-circle text-slate-300 text-2xl group-hover:text-slate-500 transition"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-800 mb-3">Institutional Fragmentation</h3>
+                    <p class="text-sm text-slate-500 font-medium uppercase tracking-wide mb-4">Legacy of 5+ repealed acts</p>
+                    <div id="challenge-1" class="hidden text-slate-600 text-sm border-t border-slate-100 pt-4 mt-2 animate-pulse-once">
+                        <p class="mb-3"><strong>The Issue:</strong> Merging distinct organizational cultures, asset registers, and IT systems. The previous "Joint Inspection Team" model is too slow for mass licensing.</p>
+                        <p class="text-red-600 font-semibold bg-red-50 p-2 rounded"><i class="fas fa-exclamation-triangle mr-2"></i>Impact: Delays in licensing mechanics, craftsmen, and health workers.</p>
+                    </div>
+                </div>
+
+                <!-- Challenge 2 -->
+                <div class="bg-white p-8 rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer group border border-transparent hover:border-orange-200" onclick="toggleDetail('challenge-2')">
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="w-14 h-14 bg-orange-50 rounded-full flex items-center justify-center text-orange-600 text-2xl group-hover:scale-110 transition-transform">
+                            <i class="fas fa-balance-scale"></i>
+                        </div>
+                        <i id="icon-challenge-2" class="fas fa-plus-circle text-slate-300 text-2xl group-hover:text-slate-500 transition"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-800 mb-3">Jurisdictional Conflict</h3>
+                    <p class="text-sm text-slate-500 font-medium uppercase tracking-wide mb-4">Internal & External Overlaps</p>
+                    <div id="challenge-2" class="hidden text-slate-600 text-sm border-t border-slate-100 pt-4 mt-2">
+                        <p class="mb-2"><strong>Internal:</strong> Secretariat vs. Assessment Boards (UVTAB/UHPAB). Executive overreach risks technical credibility.</p>
+                        <p class="mb-2"><strong>External:</strong> S. 30(3) vs S. 30(5) - TVET Council licensing vs. NCHE accreditation for university diplomas.</p>
+                    </div>
+                </div>
+
+                <!-- Challenge 3 -->
+                <div class="bg-white p-8 rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer group border border-transparent hover:border-blue-200" onclick="toggleDetail('challenge-3')">
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="w-14 h-14 bg-blue-50 rounded-full flex items-center justify-center text-blue-600 text-2xl group-hover:scale-110 transition-transform">
+                            <i class="fas fa-wallet"></i>
+                        </div>
+                        <i id="icon-challenge-3" class="fas fa-plus-circle text-slate-300 text-2xl group-hover:text-slate-500 transition"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-800 mb-3">Fiscal Vulnerability</h3>
+                    <p class="text-sm text-slate-500 font-medium uppercase tracking-wide mb-4">SDF Setup & Levy Management</p>
+                    <div id="challenge-3" class="hidden text-slate-600 text-sm border-t border-slate-100 pt-4 mt-2">
+                        <p class="mb-3"><strong>The Issue:</strong> Managing the new 1% SD Levy. Needs a transparent <strong>Special Revenue Fund (SRF)</strong> structure to comply with PFM standards.</p>
+                        <p class="text-blue-600 font-semibold bg-blue-50 p-2 rounded"><i class="fas fa-shield-alt mr-2"></i>Requirement: Robust governance to prevent underspending or misuse.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mt-10">
+                <p class="text-slate-400 text-sm italic">Click on the cards above to reveal specific pain points.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- The Solution: TOM Framework -->
+    <section id="tom-framework" class="py-24 bg-white relative">
+        <div class="container mx-auto px-4 relative z-10">
+            <div class="text-center mb-16">
+                <span class="text-amber-600 font-extrabold tracking-widest text-xs uppercase mb-2 block">The Apex Solution</span>
+                <h2 class="text-3xl md:text-5xl font-bold text-slate-900 leading-tight">Integrated Target Operating Model</h2>
+                <p class="text-slate-500 max-w-3xl mx-auto mt-6 text-lg">
+                    Three Strategic Action Frameworks designed to directly address the legislative mandates of the TVET Act 2025 and enable immediate operational readiness.
+                </p>
+            </div>
+
+            <!-- Tab Navigation -->
+            <div class="flex flex-wrap justify-center gap-4 mb-12">
+                <button onclick="switchTab('action1')" id="tab-action1" class="tab-btn bg-slate-800 text-white px-8 py-4 rounded-lg font-bold shadow-lg transition duration-300 transform scale-105 flex items-center gap-2">
+                    <span class="bg-amber-500 text-slate-900 rounded-full w-6 h-6 flex items-center justify-center text-xs">I</span>
+                    Consolidation (Process)
+                </button>
+                <button onclick="switchTab('action2')" id="tab-action2" class="tab-btn bg-stone-100 text-slate-600 px-8 py-4 rounded-lg font-bold hover:bg-stone-200 transition duration-300 flex items-center gap-2">
+                    <span class="bg-slate-300 text-slate-700 rounded-full w-6 h-6 flex items-center justify-center text-xs">II</span>
+                    Clarity (Governance)
+                </button>
+                <button onclick="switchTab('action3')" id="tab-action3" class="tab-btn bg-stone-100 text-slate-600 px-8 py-4 rounded-lg font-bold hover:bg-stone-200 transition duration-300 flex items-center gap-2">
+                    <span class="bg-slate-300 text-slate-700 rounded-full w-6 h-6 flex items-center justify-center text-xs">III</span>
+                    Finance (SDF)
+                </button>
+            </div>
+
+            <!-- Tab Content: Action I (Process Flow) -->
+            <div id="content-action1" class="tab-content fade-in block">
+                <div class="bg-slate-50 rounded-3xl p-8 border border-slate-100">
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+                        <!-- Left: Introduction -->
+                        <div class="lg:col-span-5">
+                            <h3 class="text-2xl font-bold text-slate-800 mb-4">Action I: Streamlined Digital Registration</h3>
+                            <p class="text-slate-600 mb-6 leading-relaxed">
+                                <strong>Urgent Priority:</strong> Consolidating 5+ fragmented processes into one Digital Registry System (DRS). This framework targets the removal of the slow "Joint Inspection" model to meet the Dec 15 deadline.
+                            </p>
+                            <div class="bg-amber-100 border-l-4 border-amber-500 p-4 mb-8 rounded-r-lg">
+                                <p class="text-sm text-amber-900 font-bold">
+                                    <i class="fas fa-rocket mr-2"></i>Goal: Reduce "Time-to-License" by 60% via Automated Validation.
+                                </p>
+                            </div>
+                            
+                            <!-- Interactive Process Stepper -->
+                            <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Click steps to visualize flow</h4>
+                            <div class="space-y-3">
+                                <div class="process-step p-4 rounded-xl cursor-pointer transition-all bg-white hover:shadow-md border border-slate-200 hover:border-amber-300 step-active" onclick="showStep(1)" id="step-btn-1">
+                                    <div class="flex items-center gap-4">
+                                        <div class="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold text-sm">1</div>
+                                        <div>
+                                            <div class="font-bold text-slate-800">Initiate Application</div>
+                                            <div class="text-xs text-slate-500">DRS Portal Entry</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="process-step p-4 rounded-xl cursor-pointer transition-all bg-white hover:shadow-md border border-slate-200 hover:border-amber-300" onclick="showStep(2)" id="step-btn-2">
+                                    <div class="flex items-center gap-4">
+                                        <div class="w-8 h-8 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center font-bold text-sm">2</div>
+                                        <div>
+                                            <div class="font-bold text-slate-700">Automated Validation</div>
+                                            <div class="text-xs text-slate-500">System Checks</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="process-step p-4 rounded-xl cursor-pointer transition-all bg-white hover:shadow-md border border-slate-200 hover:border-amber-300" onclick="showStep(3)" id="step-btn-3">
+                                    <div class="flex items-center gap-4">
+                                        <div class="w-8 h-8 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center font-bold text-sm">3</div>
+                                        <div>
+                                            <div class="font-bold text-slate-700">Risk-Based Review</div>
+                                            <div class="text-xs text-slate-500">Centralized Unit</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="process-step p-4 rounded-xl cursor-pointer transition-all bg-white hover:shadow-md border border-slate-200 hover:border-amber-300" onclick="showStep(4)" id="step-btn-4">
+                                    <div class="flex items-center gap-4">
+                                        <div class="w-8 h-8 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center font-bold text-sm">4</div>
+                                        <div>
+                                            <div class="font-bold text-slate-700">Audit & Assessment</div>
+                                            <div class="text-xs text-slate-500">Delegated Authority</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="process-step p-4 rounded-xl cursor-pointer transition-all bg-white hover:shadow-md border border-slate-200 hover:border-amber-300" onclick="showStep(5)" id="step-btn-5">
+                                    <div class="flex items-center gap-4">
+                                        <div class="w-8 h-8 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center font-bold text-sm">5</div>
+                                        <div>
+                                            <div class="font-bold text-slate-700">Final Publish</div>
+                                            <div class="text-xs text-slate-500">Public Registry</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right: Dynamic Display -->
+                        <div class="lg:col-span-7">
+                            <div class="bg-white rounded-2xl p-8 border border-slate-200 shadow-xl h-full flex flex-col justify-center relative overflow-hidden">
+                                <div class="absolute top-0 right-0 p-4 opacity-10 text-9xl text-slate-300"><i class="fas fa-cogs"></i></div>
+                                
+                                <div id="step-display-1" class="step-detail relative z-10">
+                                    <div class="w-16 h-16 bg-amber-100 rounded-2xl flex items-center justify-center text-amber-600 text-3xl mb-6 shadow-sm"><i class="fas fa-laptop-code"></i></div>
+                                    <h4 class="text-2xl font-bold text-slate-800 mb-4">Step 1: Digital Submission</h4>
+                                    <p class="text-slate-600 mb-4 leading-relaxed">Applicant (Institution, Trainer, or Artisan) submits unified application + digital payment via <strong>DRS Portal</strong>. This replaces manual paper trails.</p>
+                                    <ul class="text-sm text-slate-500 space-y-2">
+                                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i>Unified Application Form</li>
+                                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i>Integrated Digital Payment</li>
+                                    </ul>
+                                </div>
+
+                                <div id="step-display-2" class="step-detail hidden relative z-10">
+                                    <div class="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center text-blue-600 text-3xl mb-6 shadow-sm"><i class="fas fa-robot"></i></div>
+                                    <h4 class="text-2xl font-bold text-slate-800 mb-4">Step 2: Automated Validation</h4>
+                                    <p class="text-slate-600 mb-4 leading-relaxed">The System performs instantaneous checks for completeness, document validity, and trainer CPD (Continuous Professional Development) compliance.</p>
+                                    <div class="bg-red-50 p-3 rounded text-sm text-red-600 border border-red-100"><i class="fas fa-times-circle mr-2"></i>Incomplete apps are rejected instantly with specific feedback, reducing backlog.</div>
+                                </div>
+
+                                <div id="step-display-3" class="step-detail hidden relative z-10">
+                                    <div class="w-16 h-16 bg-purple-100 rounded-2xl flex items-center justify-center text-purple-600 text-3xl mb-6 shadow-sm"><i class="fas fa-filter"></i></div>
+                                    <h4 class="text-2xl font-bold text-slate-800 mb-4">Step 3: Risk-Based Review</h4>
+                                    <p class="text-slate-600 mb-4 leading-relaxed">Centralized Licensing Unit applies a risk matrix.</p>
+                                    <div class="grid grid-cols-2 gap-4 text-sm">
+                                        <div class="bg-green-50 p-3 rounded border border-green-100">
+                                            <strong>Low Risk (Renewals):</strong><br>Waive physical inspection.
+                                        </div>
+                                        <div class="bg-orange-50 p-3 rounded border border-orange-100">
+                                            <strong>High Risk (New):</strong><br>Trigger mandatory physical audit.
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div id="step-display-4" class="step-detail hidden relative z-10">
+                                    <div class="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center text-slate-600 text-3xl mb-6 shadow-sm"><i class="fas fa-clipboard-check"></i></div>
+                                    <h4 class="text-2xl font-bold text-slate-800 mb-4">Step 4: Audit & Assessment</h4>
+                                    <p class="text-slate-600 mb-4 leading-relaxed">If required, Delegated Independent Auditors conduct site visits. Technical competency is verified via interface with Assessment Boards (UVTAB/UHPAB).</p>
+                                    <p class="text-sm text-slate-500 italic">Findings submitted electronically via tablet apps.</p>
+                                </div>
+
+                                <div id="step-display-5" class="step-detail hidden relative z-10">
+                                    <div class="w-16 h-16 bg-emerald-100 rounded-2xl flex items-center justify-center text-emerald-600 text-3xl mb-6 shadow-sm"><i class="fas fa-award"></i></div>
+                                    <h4 class="text-2xl font-bold text-slate-800 mb-4">Step 5: Final Publish</h4>
+                                    <p class="text-slate-600 mb-4 leading-relaxed">Executive Director (or delegate) grants final approval. Digital License issued to applicant wallet. Public Registry updated immediately.</p>
+                                    <div class="bg-emerald-50 text-emerald-700 p-3 rounded text-center font-bold">
+                                        PROCESS COMPLETE
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Content: Action II (Governance Clarity) -->
+            <div id="content-action2" class="tab-content fade-in hidden">
+                <div class="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm">
+                    <h3 class="text-2xl font-bold text-slate-800 mb-4">Action II: Delegation of Authority (DOA) Matrix</h3>
+                    <p class="text-slate-600 mb-8 max-w-4xl">
+                        This framework resolves the organizational risks (S. 17(2)(d)) by establishing a formal DOA Policy. This prevents executive overreach and protects the technical independence of the Assessment Boards.
+                    </p>
+
+                    <!-- DOA Matrix -->
+                    <div class="overflow-hidden rounded-xl border border-slate-200 shadow-lg">
+                        <div class="grid grid-cols-4 bg-slate-900 text-white font-bold text-sm uppercase tracking-wider p-5">
+                            <div class="col-span-1">Decision Domain</div>
+                            <div class="col-span-1 border-l border-slate-700 pl-4">TVET Council (Board)</div>
+                            <div class="col-span-1 border-l border-slate-700 pl-4">Secretariat (CEO)</div>
+                            <div class="col-span-1 border-l border-slate-700 pl-4">Assessment Boards</div>
+                        </div>
+
+                        <!-- Row 1 -->
+                        <div class="grid grid-cols-4 text-sm divide-x divide-slate-100 border-b border-slate-100 bg-white hover:bg-stone-50 transition">
+                            <div class="p-5 font-bold text-slate-700">Strategy & Policy</div>
+                            <div class="p-5 matrix-cell text-emerald-700 font-semibold bg-emerald-50/50"><i class="fas fa-check-circle mr-2"></i>Ultimate Authority (Approves Strategic Plan)</div>
+                            <div class="p-5 matrix-cell text-slate-600">Operationalizes Strategy</div>
+                            <div class="p-5 matrix-cell text-slate-400">Consults</div>
+                        </div>
+
+                        <!-- Row 2 -->
+                        <div class="grid grid-cols-4 text-sm divide-x divide-slate-100 border-b border-slate-100 bg-white hover:bg-stone-50 transition">
+                            <div class="p-5 font-bold text-slate-700">Financial Authority</div>
+                            <div class="p-5 matrix-cell text-emerald-700 font-semibold bg-emerald-50/50"><i class="fas fa-check-circle mr-2"></i>Approves Budget</div>
+                            <div class="p-5 matrix-cell text-slate-600">Manages Ops Expenditure</div>
+                            <div class="p-5 matrix-cell text-slate-600">Manages Assessment Logistics</div>
+                        </div>
+                        
+                        <!-- Row 3 -->
+                        <div class="grid grid-cols-4 text-sm divide-x divide-slate-100 border-b border-slate-100 bg-white hover:bg-stone-50 transition">
+                            <div class="p-5 font-bold text-slate-700">Curriculum & Standards</div>
+                            <div class="p-5 matrix-cell text-slate-600">Approves Final National Curricula</div>
+                            <div class="p-5 matrix-cell text-slate-600">Admin Support</div>
+                            <div class="p-5 matrix-cell text-amber-700 font-bold bg-amber-50/50 border-l-4 border-amber-500"><i class="fas fa-star mr-2"></i>Primary Developer (Technical Lead)</div>
+                        </div>
+
+                        <!-- Row 4 -->
+                        <div class="grid grid-cols-4 text-sm divide-x divide-slate-100 bg-white hover:bg-stone-50 transition">
+                            <div class="p-5 font-bold text-slate-700">Regulatory Enforcement</div>
+                            <div class="p-5 matrix-cell text-slate-600">Appeals Body</div>
+                            <div class="p-5 matrix-cell text-amber-700 font-bold bg-amber-50/50 border-l-4 border-amber-500"><i class="fas fa-gavel mr-2"></i>Inspections & Sanctions</div>
+                            <div class="p-5 matrix-cell text-slate-600">Provides Technical Evidence</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Content: Action III (Financial Management) -->
+            <div id="content-action3" class="tab-content fade-in hidden">
+                <div class="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm">
+                    <h3 class="text-2xl font-bold text-slate-800 mb-4">Action III: Sustainable Financial Management (SDF)</h3>
+                    <p class="text-slate-600 mb-8">
+                        Mandating the **Special Revenue Fund (SRF)** structure for the 1% SD Levy. This ensures strict PFM compliance and fiscal transparency.
+                    </p>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                        <div class="bg-slate-50 p-6 rounded-2xl shadow-inner">
+                            <div class="flex justify-between items-center mb-4">
+                                <h4 class="text-lg font-bold text-slate-800">Levy Collection Efficiency Gap</h4>
+                                <span class="text-xs bg-white border px-2 py-1 rounded text-slate-500">Projected (UGX Billions)</span>
+                            </div>
+                            
+                            <!-- Chart Container -->
+                            <div class="chart-container">
+                                <canvas id="levyComplianceChart"></canvas>
+                            </div>
+                            <p class="text-center text-xs text-slate-400 mt-2">Projection Model: Current vs TOM Implementation</p>
+                        </div>
+
+                        <div class="space-y-6">
+                            <div class="bg-green-50 border-l-4 border-green-500 p-5 rounded-r-xl">
+                                <h4 class="font-bold text-green-800 mb-1">Fiscal Segregation Strategy</h4>
+                                <p class="text-sm text-green-700">Modified accrual accounting legally separates levy revenues from general operating funds. The 1% is protected for skills development only.</p>
+                            </div>
+                            
+                            <div>
+                                <h4 class="font-bold text-slate-800 mb-3 border-b pb-2">Sustainability Levers</h4>
+                                <ul class="space-y-4">
+                                    <li class="flex items-start">
+                                        <div class="bg-slate-100 p-2 rounded mr-3"><i class="fas fa-link text-slate-600"></i></div>
+                                        <div>
+                                            <p class="font-bold text-sm text-slate-700">URA Protocol</p>
+                                            <p class="text-xs text-slate-500">Formalize collection with tax authority to minimize leakage.</p>
+                                        </div>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <div class="bg-slate-100 p-2 rounded mr-3"><i class="fas fa-chart-line text-slate-600"></i></div>
+                                        <div>
+                                            <p class="font-bold text-sm text-slate-700">Diversification</p>
+                                            <p class="text-xs text-slate-500">Generate non-levy income (fees, grants, PPPs) to cover Ops.</p>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Implementation Roadmap -->
+    <section id="implementation" class="py-20 bg-stone-100 border-t border-slate-200">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold text-slate-900">Implementation Roadmap</h2>
+                <p class="text-slate-500 mt-2">Phased delivery to ensure immediate legislative compliance.</p>
+            </div>
+            
+            <div class="max-w-4xl mx-auto relative">
+                <!-- Timeline Line -->
+                <div class="absolute left-8 top-0 bottom-0 w-1 bg-slate-300 md:left-1/2 md:-ml-0.5"></div>
+
+                <!-- Phase 1 -->
+                <div class="relative flex flex-col md:flex-row items-center mb-12">
+                    <div class="flex-1 md:w-1/2 md:pr-12 md:text-right mb-4 md:mb-0 pl-20 md:pl-0">
+                        <h4 class="font-bold text-xl text-slate-800">Phase 1: Diagnostic & Blueprint</h4>
+                        <p class="text-amber-600 font-bold text-sm mb-2">Q1 - Q2 2026</p>
+                        <p class="text-slate-600 text-sm">COM Assessment, TOM Vision, and High-Level 6-Layer Blueprint (Governance, Process, People, Tech, Service, Performance).</p>
+                    </div>
+                    <div class="absolute left-4 md:left-1/2 md:-ml-4 w-8 h-8 bg-amber-500 rounded-full border-4 border-white shadow-lg flex items-center justify-center text-white font-bold text-xs z-10">1</div>
+                    <div class="flex-1 md:w-1/2 md:pl-12"></div>
+                </div>
+
+                <!-- Phase 2 -->
+                <div class="relative flex flex-col md:flex-row items-center">
+                    <div class="flex-1 md:w-1/2 md:pr-12"></div>
+                    <div class="absolute left-4 md:left-1/2 md:-ml-4 w-8 h-8 bg-slate-800 rounded-full border-4 border-white shadow-lg flex items-center justify-center text-white font-bold text-xs z-10">2</div>
+                    <div class="flex-1 md:w-1/2 md:pl-12 pl-20 md:pl-0">
+                        <h4 class="font-bold text-xl text-slate-800">Phase 2: Detailed Design</h4>
+                        <p class="text-slate-500 font-bold text-sm mb-2">Q2 - Q3 2026</p>
+                        <p class="text-slate-600 text-sm">Detailed Process Catalogues (Action I), DOA Policy Register (Action II), and SRF Accounting Manuals (Action III).</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 py-12">
+        <div class="container mx-auto px-4 text-center">
+            <div class="w-12 h-12 bg-amber-500 rounded flex items-center justify-center font-bold text-slate-900 mx-auto mb-4">A</div>
+            <p class="text-sm font-medium mb-2">&copy; 2025 Apex Consulting. Proposal for TVET Council, Uganda.</p>
+            <p class="text-xs opacity-50">Pursuant to Section 17 (2) (d)</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+        // State Management
+        const state = {
+            activeTab: 'action1',
+            currentStep: 1,
+            isDetailOpen: {
+                'challenge-1': false,
+                'challenge-2': false,
+                'challenge-3': false
+            }
+        };
+
+        // --- Challenge Section Logic ---
+        function toggleDetail(id) {
+            const el = document.getElementById(id);
+            const icon = document.getElementById(`icon-${id}`);
+            state.isDetailOpen[id] = !state.isDetailOpen[id];
+
+            if (state.isDetailOpen[id]) {
+                el.classList.remove('hidden');
+                el.classList.add('fade-in');
+                icon.classList.remove('fa-plus-circle');
+                icon.classList.add('fa-minus-circle');
+            } else {
+                el.classList.add('hidden');
+                icon.classList.remove('fa-minus-circle');
+                icon.classList.add('fa-plus-circle');
+            }
+        }
+
+        // --- TOM Tab Logic ---
+        function switchTab(tabId) {
+            // Update Buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('bg-slate-800', 'text-white', 'scale-105', 'shadow-lg');
+                btn.classList.add('bg-stone-100', 'text-slate-600', 'hover:bg-stone-200');
+            });
+            
+            const activeBtn = document.getElementById(`tab-${tabId}`);
+            activeBtn.classList.remove('bg-stone-100', 'text-slate-600', 'hover:bg-stone-200');
+            activeBtn.classList.add('bg-slate-800', 'text-white', 'scale-105', 'shadow-lg');
+
+            // Hide all content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+                content.classList.remove('block');
+            });
+
+            // Show active content
+            document.getElementById(`content-${tabId}`).classList.remove('hidden');
+            document.getElementById(`content-${tabId}`).classList.add('block');
+
+            // Trigger chart render if switching to finance tab
+            if (tabId === 'action3') {
+                renderChart();
+            }
+        }
+
+        // --- Action I: Process Stepper Logic ---
+        function showStep(stepNum) {
+            // Update buttons styling
+            document.querySelectorAll('.process-step').forEach(step => {
+                step.classList.remove('step-active', 'border-amber-300', 'shadow-md');
+                // Reset icon colors
+                const circle = step.querySelector('.rounded-full');
+                circle.classList.remove('bg-slate-900', 'text-white');
+                circle.classList.add('bg-slate-200', 'text-slate-600');
+            });
+
+            const activeStep = document.getElementById(`step-btn-${stepNum}`);
+            activeStep.classList.add('step-active', 'border-amber-300', 'shadow-md');
+            const activeCircle = activeStep.querySelector('.rounded-full');
+            activeCircle.classList.remove('bg-slate-200', 'text-slate-600');
+            activeCircle.classList.add('bg-slate-900', 'text-white');
+
+            // Update content display
+            document.querySelectorAll('.step-detail').forEach(detail => detail.classList.add('hidden'));
+            document.getElementById(`step-display-${stepNum}`).classList.remove('hidden');
+            document.getElementById(`step-display-${stepNum}`).classList.add('fade-in');
+        }
+
+        // --- Action III: Chart Logic ---
+        let chartInstance = null;
+
+        function renderChart() {
+            if (chartInstance) return; // Prevent re-rendering
+
+            const ctx = document.getElementById('levyComplianceChart').getContext('2d');
+            
+            chartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Current Model', 'With TOM Implementation'],
+                    datasets: [
+                        {
+                            label: 'Projected Levy Collection (Billions UGX)',
+                            data: [45, 120], // Mock data representing the gap
+                            backgroundColor: [
+                                'rgba(148, 163, 184, 0.5)', // Slate-400
+                                'rgba(245, 158, 11, 0.8)'   // Amber-500
+                            ],
+                            borderColor: [
+                                'rgb(148, 163, 184)',
+                                'rgb(245, 158, 11)'
+                            ],
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return ` Collection: ${context.raw}B UGX`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Revenue (Billions UGX)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
